@@ -31,7 +31,7 @@ class LinkedList {
   remove(node) {
     if (this.mHead !== null) {
       if (this.mHead.mId === node.mId) {
-        this.mHead = null;
+        this.mHead = this.mHead.mNext;
         return;
       }
 
@@ -42,60 +42,104 @@ class LinkedList {
           tmp.mNext = tmp.mNext.mNext;
           break;
         }
-        traverser = traverser.next;
-      }
-    }
-  }
-
-  toString() {
-    if (this.mHead !== null) {
-      let traverser = this.mHead;
-      while (traverser !== null) {
-        console.log(traverser.mValue);
         traverser = traverser.mNext;
       }
     }
   }
 
+  toString() {
+    let str = '[';
+    if (this.mHead !== null) {
+      let traverser = this.mHead;
+      while (traverser !== null) {
+        str += traverser.mValue + ', ';
+        traverser = traverser.mNext;
+      }
+    }
+    str += ']';
+    return str;
+  }
+
   empty() {
     return this.mHead === null;
+  }
+
+  size() {
+    let size = 0,
+        traverser = this.mHead;
+    while (traverser !== null) {
+      size++;
+      traverser = traverser.mNext;
+    }
+    return size;
+  }
+
+  contains(data) {
+    let traverser = this.mHead;
+    while (traverser !== null) {
+      if (traverser.mValue === data) return true;
+      traverser = traverser.mNext;
+    }
+    return false;
   }
 };
 
 let removeDupes = (linkedList) => {
   if (linkedList.empty()) return;
+  let runner = linkedList.mHead,
+      cache = [];
 
-  let prev = linkedList.mHead,
-      current = linkedList.mHead.mNext;
-
-  while (current !== null) {
-    let runner = linkedList.mHead;
-
-    while (runner.mId !== current.mId) {
-      if (runner.mValue === current.mValue) {
-        break;
-      }
-      runner = runner.mNext;
-    }
-
-    if (runner.mId === current.mId) {
-      prev = current;
-      current = prev.mNext;
-    }
+  while (runner !== null) {
+    if (cache.indexOf(runner.mValue) === -1) cache.push(runner.mValue);
+    runner = runner.mNext;
   }
 
+  let ll = new LinkedList();
+  cache.forEach((e) => ll.add(e));
+
+  return ll;
+};
+
+let removeNthFromLast = (linkedList, n) => {
+  let size = linkedList.size() - 1,
+      i = 0,
+      span = size - n - 1,
+      node = linkedList.mHead;
+
+  if (span < 0) return null;
+  
+  while (i < span) {
+    node = node.mNext;
+    ++i;
+  }
+
+  linkedList.remove(node);
   return linkedList;
 };
 
-let ll = new LinkedList();
-ll.add(1);
-ll.add(1);
-ll.add(1);
-ll.add(2);
-ll.add(3);
-let ll2 = removeDupes(ll);
+let addTwoNums = (ll1, ll2) => {
+  let t1 = ll1.mHead,
+      t2 = ll2.mHead,
+      getNum = (traverser) => {
+        let num = 0,
+            iterator = 0;
+        while (traverser !== null) {
+          let d = traverser.mValue,
+              exp = d * Math.pow(10, iterator);
+          num += exp;
+          traverser = traverser.mNext;
+          ++iterator;
+        }
+        return num;
+      };
+  let num1 = getNum(t1),
+      num2 = getNum(t2);
+  return num1 + num2;
+};
 
 module.exports = {
   LinkedList: LinkedList,
   removeDupes: removeDupes,
+  removeNthFromLast: removeNthFromLast,
+  addTwoNums: addTwoNums
 }
